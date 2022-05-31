@@ -1,5 +1,4 @@
-import * as UserModel from "../models/users.model";
-import crypto from "crypto";
+import * as MeetingModel from "../models/meeting.model";
 import { Request, Response } from "express";
 
 export const insert = (req: Request, res: Response) => {
@@ -11,7 +10,7 @@ export const insert = (req: Request, res: Response) => {
     .digest("base64");
   req.body.password = salt + "$" + hash;
   req.body.permissionLevel = 1;
-  UserModel.createUser(req.body).then((result) => {
+  MeetingModel.createMeeting(req.body).then((result) => {
     res.status(201).send({ id: result._id });
   });
 };
@@ -29,33 +28,24 @@ export const list = (req: Request, res: Response) => {
         : 0;
     }
   }
-  UserModel.list(limit, page).then((result) => {
+  MeetingModel.list(limit, page).then((result) => {
     res.status(200).send(result);
   });
 };
 
 export const getById = (req: Request, res: Response) => {
-  UserModel.findById(req.params.userId).then((result) => {
+  MeetingModel.findById(req.params.userId).then((result) => {
     res.status(200).send(result);
   });
 };
 export const patchById = (req: Request, res: Response) => {
-  if (req.body.password) {
-    let salt = crypto.randomBytes(16).toString("base64");
-    let hash = crypto
-      .createHmac("sha512", salt)
-      .update(req.body.password)
-      .digest("base64");
-    req.body.password = salt + "$" + hash;
-  }
-
-  UserModel.patchUser(req.params.userId, req.body).then((result) => {
+  MeetingModel.patchMeeting(req.params.meetingId, req.body).then((result) => {
     res.status(204).send({});
   });
 };
 
 export const removeById = (req: Request, res: Response) => {
-  UserModel.removeById(req.params.userId).then((result) => {
+  MeetingModel.removeById(req.params.userId).then((result) => {
     res.status(204).send({});
   });
 };

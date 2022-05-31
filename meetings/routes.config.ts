@@ -1,6 +1,7 @@
-import * as UsersController from "./controllers/users.controller";
+import * as MeetingsController from "./controllers/meetings.controller";
 import * as PermissionMiddleware from "../common/middlewares/auth.permission.middleware";
 import * as ValidationMiddleware from "../common/middlewares/auth.validation.middleware";
+import * as MeetingsMiddleware from "../common/middlewares/meetings.permission.middleware";
 import { Express } from "express";
 import { config } from "../common/config/env.config";
 
@@ -9,27 +10,26 @@ const PAID = config.permissionLevels.PAID_USER;
 const FREE = config.permissionLevels.NORMAL_USER;
 
 export const routesConfig = (app: Express) => {
-  app.post("/users", [UsersController.insert]);
-  app.get("/users", [
-    ValidationMiddleware.validJWTNeeded,
-    PermissionMiddleware.minimumPermissionLevelRequired(PAID),
-    UsersController.list,
-  ]);
-  app.get("/users/:userId", [
-    ValidationMiddleware.validJWTNeeded,
-    PermissionMiddleware.minimumPermissionLevelRequired(FREE),
-    PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
-    UsersController.getById,
-  ]);
-  app.patch("/users/:userId", [
-    ValidationMiddleware.validJWTNeeded,
-    PermissionMiddleware.minimumPermissionLevelRequired(FREE),
-    PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
-    UsersController.patchById,
-  ]);
-  app.delete("/users/:userId", [
+  app.get("/meetings", [
     ValidationMiddleware.validJWTNeeded,
     PermissionMiddleware.minimumPermissionLevelRequired(ADMIN),
-    UsersController.removeById,
+    MeetingsController.list,
+  ]);
+  app.get("/users/:meetingId", [
+    ValidationMiddleware.validJWTNeeded,
+    PermissionMiddleware.minimumPermissionLevelRequired(FREE),
+    PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
+    MeetingsController.getById,
+  ]);
+  app.patch("/meetings/:userid/:meetingId", [
+    ValidationMiddleware.validJWTNeeded,
+    PermissionMiddleware.minimumPermissionLevelRequired(FREE),
+    PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
+    MeetingsController.patchById,
+  ]);
+  app.delete("/meetings/:meetingId", [
+    ValidationMiddleware.validJWTNeeded,
+    PermissionMiddleware.minimumPermissionLevelRequired(ADMIN),
+    MeetingsController.removeById,
   ]);
 };

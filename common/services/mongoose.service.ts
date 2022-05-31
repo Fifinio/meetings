@@ -15,11 +15,10 @@ const options = {
 };
 
 const db = mongoose;
-console.log(DB_CONNECTION_STRING);
 if(!DB_CONNECTION_STRING) throw new Error('DB_CONNECTION_STRING is not defined');
 
 const connectWithRetry = () => {
-    console.log('MongoDB connection with retry')
+    console.log('MongoDB trying to connect to MongoDB')
     db.connect(DB_CONNECTION_STRING, options).then(()=>{
         console.log('MongoDB is connected')
     }).catch(err=>{
