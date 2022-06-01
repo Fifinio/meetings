@@ -44,12 +44,8 @@ export const validJWTNeeded = (
   let authorization = req.headers["authorization"]?.split(" ");
   if (authorization && authorization[0] === "Bearer") {
     try {
-      if (authorization[0] !== "Bearer") {
-        return res.status(401).send();
-      } else {
-        req.body.jwt = jwt.verify(authorization[1], secret);
-        return next();
-      }
+      req.body.jwt = jwt.verify(authorization[1], secret);
+      return next();
     } catch (err) {
       return res.status(403).send();
     }

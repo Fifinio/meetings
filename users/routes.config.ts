@@ -10,6 +10,7 @@ const FREE = config.permissionLevels.NORMAL_USER;
 
 export const routesConfig = (app: Express) => {
   app.post("/users", [UsersController.insert]);
+
   app.get("/users", [
     ValidationMiddleware.validJWTNeeded,
     PermissionMiddleware.minimumPermissionLevelRequired(PAID),

@@ -1,5 +1,4 @@
 export interface IMeeting {
-  id: string;
   title: string;
   description: string;
   TimeZone: string;

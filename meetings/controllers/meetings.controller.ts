@@ -1,15 +1,13 @@
 import * as MeetingModel from "../models/meeting.model";
 import { Request, Response } from "express";
+import * as UserModel from "../../users/models/users.model";
 
 export const insert = (req: Request, res: Response) => {
-  console.log("got to the controller - insert");
-  let salt = crypto.randomBytes(16).toString("base64");
-  let hash = crypto
-    .createHmac("sha512", salt)
-    .update(req.body.password)
-    .digest("base64");
-  req.body.password = salt + "$" + hash;
-  req.body.permissionLevel = 1;
+  if (!req.body.title || !req.body.date || !req.body.startTime) {
+    return res.status(400).send("Missing required fields");
+  }
+  if (!req.body.attendeesIds) req.body.attendeesIds = [req.body.jwt.userId]; //default to the user that created the meeting
+
   MeetingModel.createMeeting(req.body).then((result) => {
     res.status(201).send({ id: result._id });
   });
@@ -38,14 +36,30 @@ export const getById = (req: Request, res: Response) => {
     res.status(200).send(result);
   });
 };
+
 export const patchById = (req: Request, res: Response) => {
   MeetingModel.patchMeeting(req.params.meetingId, req.body).then((result) => {
     res.status(204).send({});
   });
 };
 
+export const addAteendee = (req: Request, res: Response) => {
+  if (!req.body.userId) return res.status(400).send("Missing required fields");
+  MeetingModel.addAteendee(req.params.meetingId, req.body.userId).then(
+    (result) => {
+      res.status(204).send({});
+    }
+  );
+};
+
 export const removeById = (req: Request, res: Response) => {
   MeetingModel.removeById(req.params.userId).then((result) => {
     res.status(204).send({});
   });
+};
+
+// remove all records from the database that have a startTime that is before the current time + 7 days
+export const cleanUpDatabase = async (req: Request, res: Response) => {
+  await MeetingModel.removeAllMeetingsBefore(new Date().toISOString());
+  res.status(204).send({});
 };
